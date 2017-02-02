@@ -9,9 +9,9 @@ public class Player {
 	public String name;
 	public double WAR;
 	
-	public Player(Position position, int season, String name, double WAR) {
+	public Player(String position, int season, String name, double WAR) {
 		this.id = ++count;
-		this.position = position;
+//		this.position = position;
 		this.season = season;
 		this.name = name;
 		this.WAR = WAR;
