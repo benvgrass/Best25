@@ -27,7 +27,7 @@ public class Calculator {
 				 System.err.println("info was of lenth " + info.length + "at player " + players.size());
 				 System.exit(-1);
 			 }
-			 p = new Player(info[0], Integer.parseInt(info[1]), info[2], Double.parseDouble(info[3]));
+			 p = new Player(info[0], Integer.parseInt(info[1]), info[2], Double.parseDouble(info[3]), Integer.parseInt(info[4]));
 			 players.add(p);
 		}
 		scanner.close();

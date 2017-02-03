@@ -75,8 +75,7 @@ Data was compiled in a fairly simple manner. First, I went to the
   2) We switched the order of the characters for the position "1B", "2B", and
    "3B" because we thought it would make it easier to parse. We then changed 
    the parser and but there is no compelling reason to change it back. 
-  3) There are Fangraphs player IDs everywhere and may be used to distinguish
-   players rather than using name, yet may not have a use. 
+  3) The data contains Fangraphs player IDs and they are used to make sure no players are repeated. 
  
  After all of that the data was ready to use in our program!
 

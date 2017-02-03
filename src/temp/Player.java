@@ -8,13 +8,16 @@ public class Player {
 	private int season;
 	private String name;
 	private double WAR;
+	private int fID;
 	
-	public Player(String position, int season, String name, double WAR) {
+	public Player(String position, int season, String name, double WAR,
+				  int fID) {
 		this.id = ++count;
 		this.position = parsePosition(position);
 		this.season = season;
 		this.name = name;
 		this.WAR = WAR;
+		this.fID = fID;
 	}
 
 	public int getId() {
@@ -35,6 +38,10 @@ public class Player {
 
 	public double getWAR() {
 		return WAR;
+	}
+
+	public int getfID() {
+		return fID;
 	}
 
 	private static Position parsePosition(String posString) {
