@@ -31,25 +31,25 @@ public class Calculator {
 			playerYears.get(p.getSeason() - 1992).add(p);
 		}
 		
-		ArrayList<Rostor> topRostors = new ArrayList<Rostor>(25);
+		ArrayList<Roster> topRosters = new ArrayList<Roster>(25);
 		for(int i = 0; i < 25; i++) {
-			Rostor r = new Rostor();
+			Roster r = new Roster();
 			
 			ArrayList<Player> YearOfPlayers = playerYears.get(i);
 			Position[] totalPositions = {Position.B1, Position.B2, Position.B3, Position.C, Position.C, Position.CF, Position.DH, Position.LF, Position.OF, Position.OF, Position.RF, Position.RP, Position.RP, Position.RP, Position.RP, Position.RP, Position.RP, Position.RP, Position.SP, Position.SP, Position.SP, Position.SP, Position.SP, Position.SS, Position.SS};
 			for(Player p: YearOfPlayers) {
 				if(totalPositions.length == 0)
 					break;
-				
+
 				if(contains(totalPositions, p.getPosition())) {
 					totalPositions = remove(totalPositions, p.getPosition());
 					r.add(p);
 				}
 			}
-			topRostors.add(r);
+			topRosters.add(r);
 		}
 		
-		//here we will have the best rostors in topRostors
+		//here we will have the best rosters in topRosters
 	}
 	
 	private static ArrayList<Player> getPlayersFromFile() throws IOException {
