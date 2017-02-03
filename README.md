@@ -27,7 +27,7 @@ do this, there were a few choices to make in terms of how to design the team.
    pretty low and the system may waste a good position player year to 
    accommodate a reliever, but in reality I just felt like another position 
    player would be more interesting than an extra reliever. The Baseball 
-   Prospectus article ([see below](#Inspiration)) had a 5 man bench so I figure
+   Prospectus article ([see below](#inspiration)) had a 5 man bench so I figure
    may as well go with a more normal 4 and have some basis for comparison 
    between the author's list and the one generated from this, though she used
    bWAR for her WAR versus this system using fWAR so theoretically there 
