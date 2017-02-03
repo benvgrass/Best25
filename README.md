@@ -10,7 +10,9 @@ do this, there were a few choices to make in terms of how to design the team.
  WAR was an easy choice for maximization criteria because it attempts to 
  represent a value for a player, so using that you'd assemble the team that 
  could potentially be the most valuable and thus in my mind most productive 
- overall. Another choice was how to partition the roster. <br>The roster will
+ overall. Another choice was how to partition the roster. 
+ 
+ The roster will
   be partitioned as follows:
    - 5 Starting Pitchers
    - 7 Relief Pitchers
@@ -30,7 +32,8 @@ do this, there were a few choices to make in terms of how to design the team.
    between the author's list and the one generated from this, though she used
    bWAR for her WAR versus this system using fWAR so theoretically there 
    could be some differences in the concept of value on top of her list not 
-   being programmatically generated.<br>
+   being programmatically generated.
+   
    Another thing of note is that I chose to not adjust for the fact that 
    relievers may be undervalued in terms contributing to wins in WAR, so the 
    team that is produced will likely not put an emphasis on taking strong 
@@ -42,7 +45,41 @@ do this, there were a few choices to make in terms of how to design the team.
      rather than the difference between one player-season to another. That 
      being said, relievers are not treated specially because they have a 
      fundamentally different role than other players.  
-      
+
+### Compiling the Data
+Data was compiled in a fairly simple manner. First, I went to the
+ [Fangraphs](http://www.fangraphs.com/) leaderboard section, set multiple 
+ seasons to be from 1992 (25 years from now) to 2016. I then split the 
+ seasons and created a custom leaderboard that just included WAR (because 
+ season and name are automatically included). I then selected the team to be 
+ Blue Jays.Then, I went through each position and exported the data. The 
+ results of this can be seen in [data/jays_raw](/data/jays_raw). I then 
+ compiled that into a [final CSV](/data/jays.csv) which included the positions of 
+ the players 
+ so that it could be easily read into the program. There are a few things of 
+ note here. 
+ 1) Players can be listed with same season statistically for multiple 
+ positions for a particular year. An example would be Edwin Encarnación in 
+ 2015, where he was listed as both a first baseman and DH. This isn't really 
+ a problem because players can't be repeated so really it just adds a 
+ dimension of positional versatility. This is also intersting in the case of 
+ backup outfielders, which can be anyone from the OF list, which is composed 
+ of all outfielders in all years. This allows positional versatility for the 
+ backups, but it could create a situation where one of the two OF positions 
+ (which should be bench players) have a higher WAR value than that of a 
+ starter in the outfield. This is actually likely in the case of left field, 
+ where left fielders probably won't end up being the backups, but if there is
+  a situation where manually I can switch a supposed backup with a higher WAR
+   than a starter where the backup actually players the starting position I 
+   will manually do so at the end. 
+  2) We switched the order of the characters for the position "1B", "2B", and
+   "3B" because we thought it would make it easier to parse. We then changed 
+   the parser and but there is no compelling reason to change it back. 
+  3) There are Fangraphs player IDs everywhere and may be used to distinguish
+   players rather than using name, yet may not have a use. 
+ 
+ After all of that the data was ready to use in our program!
+
 
 ## Inspiration
 
