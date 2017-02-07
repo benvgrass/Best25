@@ -61,11 +61,10 @@ public class Calculator {
 		
 		System.out.println(playedMultiple.size() + players.size());
 		
-		ArrayList<Rostor> topRostors = new ArrayList<Rostor>(25);
+		ArrayList<Roster> topRosters = new ArrayList<Roster>(25);
 		for(int i = 0; i < 25; i++) {
-			topRostors.add(new Rostor());
+			topRosters.add(new Roster());
 		}
-//		playerYears.get(p.getSeason() - 1992).add(p);
 	}
 	
 	private static ArrayList<Player> getPlayersFromFile() throws IOException {
