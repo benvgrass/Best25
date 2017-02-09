@@ -6,8 +6,14 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-public class Calculator {
+public class Calculator {	
 	private static final String dataPath = "data" + File.separator + "jays.csv";
+	
+	private static ArrayList<ArrayList<Player>> years;
+	private static LinkedList<Player> bestPlayers;
+	private static int bestWar = 0;
+	
+	private static Roster currentRoster = new Roster();
 	
 	public static void main(String[] args) throws IOException {
 		ArrayList<Player> players = getPlayersFromFile();
@@ -22,49 +28,22 @@ public class Calculator {
 				return 0;
 			}
 		});
-		System.out.println(players.size());
+		System.out.println(players.size());	
 		
-		HashMap<Integer, RepeatPlayer> repeatPlayers = new HashMap<Integer, RepeatPlayer>();
-		LinkedList<Player> playedMultiple = new LinkedList<Player>();
-		Player p;
+		years = new ArrayList<ArrayList<Player>>(25);
+		for(int i = 0; i < 25; i++) {
+			years.add(new ArrayList<Player>());
+		}
 		
-		for(int i = 0; i < players.size(); i++) {
-			p = players.get(i);
-			if( repeatPlayers.containsKey(p.getfID()) ) {
-				RepeatPlayer rp = repeatPlayers.get(p.getfID());
-				if(rp.multiple) {
-					playedMultiple.add(p);
-					players.remove(i);
-					i--; //so that the loop doesn't mess up
-				} else if(rp.plays != p.getPosition()) {
-					rp.multiple = true;
-					players.remove(i);
-					playedMultiple.add(p);
-					for(Player mutiple: rp.GamesPlayed) {
-						players.remove(mutiple);
-						playedMultiple.add(mutiple);
-					}
-					i = i - (rp.GamesPlayed.size() + 1);
-				} else { //the player is playing the same position
-					rp.GamesPlayed.add(p);
-				}
-			} else { //there is no player with the key in the list yet
-				repeatPlayers.put(p.getfID(), new RepeatPlayer(p));
-				
+		for(Player p: players) {
+			if(p.getWAR() > 0) {
+				years.get(p.getSeason() - 1992).add(p);
 			}
 		}
-		p = null;
-		repeatPlayers = null;
 		
-		System.out.println(playedMultiple.size());
-		System.out.println(players.size());
+		findBest(24);
 		
-		System.out.println(playedMultiple.size() + players.size());
-		
-		ArrayList<Roster> topRosters = new ArrayList<Roster>(25);
-		for(int i = 0; i < 25; i++) {
-			topRosters.add(new Roster());
-		}
+		System.out.println("best WAR: " + bestWar);
 	}
 	
 	private static ArrayList<Player> getPlayersFromFile() throws IOException {
@@ -89,24 +68,27 @@ public class Calculator {
 		
 		return players;
 	}
-	
-	public static boolean contains(Position[] positions, Position p) {
-		for(Position p1: positions) {
-			if(p1 == p) return true;
+
+	private static int i = 0;
+	private static void findBest(int year) {
+		if(year < 0) {
+			return;
 		}
-		return false;
-	}
-	
-	public static Position[] remove(Position[] positions, Position p) {
-		Position[] ps = new Position[positions.length - 1];
-		int found = 0;
-		for(int i = 0; i < positions.length; i++) {
-			if(found == 0 && positions[i] == p) {
-				found = 1;
-			} else {
-				ps[i - found] = positions[i];
+		
+		for(Player p: years.get(year)) {
+			if(year == 24) {
+				System.out.println(year + ": " + (++i));
+			}
+			if(currentRoster.add(p)) { //adding player is valid
+				if(year == 0) {
+					if(currentRoster.getWar() > bestWar) {
+						bestPlayers = currentRoster.getPlayers();
+					}
+				} else {
+					findBest(year - 1);
+				}
+				currentRoster.remove(p);
 			}
 		}
-		return ps;
 	}
 }
