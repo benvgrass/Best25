@@ -3,12 +3,21 @@ package temp;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
 
-public class Calculator {
+public class Calculator {	
 	private static final String dataPath = "data" + File.separator + "jays.csv";
+	
+	private static ArrayList<ArrayList<Player>> years;
+	private static LinkedList<Player> bestPlayers;
+	private static int bestWar = 0;
+	
+	private static Roster currentRoster = new Roster();
 	
 	public static void main(String[] args) throws IOException {
 		ArrayList<Player> players = getPlayersFromFile();
+		System.out.println(players.size());
 		players.sort(new Comparator<Player>() {
 			@Override
 			public int compare(Player o1, Player o2) {
@@ -19,37 +28,22 @@ public class Calculator {
 				return 0;
 			}
 		});
+		System.out.println(players.size());	
 		
-		// create a new list of possible players to pick from every year
-		ArrayList<ArrayList<Player>> playerYears = new ArrayList<ArrayList<Player>>(25);
+		years = new ArrayList<ArrayList<Player>>(25);
 		for(int i = 0; i < 25; i++) {
-			playerYears.add(new ArrayList<Player>());
+			years.add(new ArrayList<Player>());
 		}
 		
-		//add top 25 players per year
 		for(Player p: players) {
-			playerYears.get(p.getSeason() - 1992).add(p);
-		}
-		
-		ArrayList<Roster> topRosters = new ArrayList<Roster>(25);
-		for(int i = 0; i < 25; i++) {
-			Roster r = new Roster();
-			
-			ArrayList<Player> YearOfPlayers = playerYears.get(i);
-			Position[] totalPositions = {Position.B1, Position.B2, Position.B3, Position.C, Position.C, Position.CF, Position.DH, Position.LF, Position.OF, Position.OF, Position.RF, Position.RP, Position.RP, Position.RP, Position.RP, Position.RP, Position.RP, Position.RP, Position.SP, Position.SP, Position.SP, Position.SP, Position.SP, Position.SS, Position.SS};
-			for(Player p: YearOfPlayers) {
-				if(totalPositions.length == 0)
-					break;
-
-				if(contains(totalPositions, p.getPosition())) {
-					totalPositions = remove(totalPositions, p.getPosition());
-					r.add(p);
-				}
+			if(p.getWAR() > 0) {
+				years.get(p.getSeason() - 1992).add(p);
 			}
-			topRosters.add(r);
 		}
 		
-		//here we will have the best rosters in topRosters
+		findBest(24);
+		
+		System.out.println("best WAR: " + bestWar);
 	}
 	
 	private static ArrayList<Player> getPlayersFromFile() throws IOException {
@@ -74,12 +68,27 @@ public class Calculator {
 		
 		return players;
 	}
-	
-	public static boolean contains(Position[] positions, Position p) {
-		return true; //TODO implement this
-	}
-	
-	public static Position[] remove(Position[] positions, Position p) {
-		return null; //TODO implement this
+
+	private static int i = 0;
+	private static void findBest(int year) {
+		if(year < 0) {
+			return;
+		}
+		
+		for(Player p: years.get(year)) {
+			if(year == 24) {
+				System.out.println(year + ": " + (++i));
+			}
+			if(currentRoster.add(p)) { //adding player is valid
+				if(year == 0) {
+					if(currentRoster.getWar() > bestWar) {
+						bestPlayers = currentRoster.getPlayers();
+					}
+				} else {
+					findBest(year - 1);
+				}
+				currentRoster.remove(p);
+			}
+		}
 	}
 }
