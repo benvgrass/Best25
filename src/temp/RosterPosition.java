@@ -44,4 +44,13 @@ public class RosterPosition {
         return false;
     }
 
+    @Override
+    public String toString() {
+        return "RosterPosition{" +
+                "max=" + max +
+                ", numPlayers=" + numPlayers +
+                ", players=" + players +
+                ", war=" + getWAR() +
+                '}';
+    }
 }

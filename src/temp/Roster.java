@@ -55,4 +55,14 @@ public class Roster {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "Roster{" +
+				"available=" + available +
+				'}';
+	}
+
+	public static void main(String[] args) {
+
+	}
 }
