@@ -2,6 +2,7 @@ package temp;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 
@@ -9,6 +10,7 @@ public class Calculator {
 	private static final String dataPath = "data" + File.separator + "jays.csv";
 	
 	private static ArrayList<ArrayList<Player>> years;
+	private static double[] bestPerYear;
 	private static LinkedList<Player> bestPlayers;
 	private static double bestWar = 0;
 	
@@ -16,7 +18,6 @@ public class Calculator {
 	
 	public static void main(String[] args) throws IOException {
 		ArrayList<Player> players = getPlayersFromFile();
-		System.out.println(players.size());
 		players.sort(new Comparator<Player>() {
 			@Override
 			public int compare(Player o1, Player o2) {
@@ -40,6 +41,15 @@ public class Calculator {
 			}
 		}
 		
+		bestPerYear = new double[25];
+		for(int i = 0; i < 25; i++) {
+			bestPerYear[i] = years.get(i).get(0).getWAR();
+		}
+		for(int i = 1; i < 25; i++) {
+			bestPerYear[i] += bestPerYear[i - 1]; 
+		}
+		
+		System.out.println(Arrays.toString(bestPerYear));
 		findBest(24);
 		
 		System.out.println("best WAR: " + bestWar);
@@ -76,9 +86,14 @@ public class Calculator {
 		
 		int i = 0;
 		for(Player p: years.get(year)) {
-			if(year > 20) {
+			if(year > 10) {
 				System.out.println(year + ": " + (++i));
 			}
+			
+			if(year > 0 && currentRoster.getWar() + bestPerYear[year - 1] + p.getWAR() < bestWar) {
+				return ;
+			}
+			
 			if(currentRoster.add(p)) { //adding player is valid
 				if(year == 0) {
 					if(currentRoster.getWar() > bestWar) {
