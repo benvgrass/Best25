@@ -75,4 +75,10 @@ public class Player {
 				return Position.RP;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "Player [id=" + id + ", position=" + position + ", season=" + season + ", name=" + name + ", WAR=" + WAR
+				+ ", fID=" + fID + "]";
+	}
 }

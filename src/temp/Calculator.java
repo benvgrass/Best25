@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
+
 public class Calculator {	
 	private static final String dataPath = "data" + File.separator + "jays.csv";
 	
@@ -44,6 +46,7 @@ public class Calculator {
 		findBest(24);
 		
 		System.out.println("best WAR: " + bestWar);
+		System.out.println(bestPlayers.toString());
 	}
 	
 	private static ArrayList<Player> getPlayersFromFile() throws IOException {
@@ -87,7 +90,7 @@ public class Calculator {
 				} else {
 					findBest(year - 1);
 				}
-				currentRoster.remove(p);
+				currentRoster.removePlayer(p);
 			}
 		}
 	}
