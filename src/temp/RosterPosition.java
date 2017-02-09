@@ -36,7 +36,12 @@ public class RosterPosition {
     }
 
     public boolean removePlayer(Player p) {
-        return players.remove(p);
+
+        if (players.remove(p)) {
+            numPlayers--;
+            return true;
+        }
+        return false;
     }
 
 }
