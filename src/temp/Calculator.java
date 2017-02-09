@@ -3,17 +3,14 @@ package temp;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
-
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.SystemMenuBar;
 
 public class Calculator {	
 	private static final String dataPath = "data" + File.separator + "jays.csv";
 	
 	private static ArrayList<ArrayList<Player>> years;
 	private static LinkedList<Player> bestPlayers;
-	private static int bestWar = 0;
+	private static double bestWar = 0;
 	
 	private static Roster currentRoster = new Roster();
 	
@@ -72,19 +69,20 @@ public class Calculator {
 		return players;
 	}
 
-	private static int i = 0;
 	private static void findBest(int year) {
 		if(year < 0) {
 			return;
 		}
 		
+		int i = 0;
 		for(Player p: years.get(year)) {
-			if(year == 24) {
+			if(year > 20) {
 				System.out.println(year + ": " + (++i));
 			}
 			if(currentRoster.add(p)) { //adding player is valid
 				if(year == 0) {
 					if(currentRoster.getWar() > bestWar) {
+						bestWar = currentRoster.getWar();
 						bestPlayers = currentRoster.getPlayers();
 					}
 				} else {
