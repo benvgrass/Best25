@@ -3,6 +3,8 @@ package temp;
 public class Player {
 	private static int count = 0;
 	
+	protected static final Player defaultPlayer = new Player();
+	
 	private int id;
 	private Position position;
 	private int season;
@@ -18,6 +20,15 @@ public class Player {
 		this.name = name;
 		this.WAR = WAR;
 		this.fID = fID;
+	}
+	
+	public Player() {
+		this.id = count;
+		this.position = null;
+		this.season = 0;
+		this.name = null;
+		this.WAR = 0;
+		this.fID = 0;
 	}
 
 	public int getId() {

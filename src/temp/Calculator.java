@@ -2,30 +2,32 @@ package temp;
 
 import java.io.*;
 import java.util.*;
-import java.awt.datatransfer.*;
-import java.awt.Toolkit;
 
 
-public class Calculator {	
+public class Calculator {
 	private static final String dataPath = "data" + File.separator + "jays.csv";
 	
-	private static ArrayList<ArrayList<Player>> years;
+	//all players info vars
+	private static ArrayList<ArrayList<ArrayList<Player>>> array;
+	private static int[] positionsMappings = {0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 5, 6, 0, 0, 0, 1, -1, -1, -1, -1, -1, -1, 1, 1, -1}; //-1 means there is only one
+																																 // number represents the occurrence of the repeat
+																																 // for more info refer to positions[] in main
 	private static double[] bestPerYear;
-	private static LinkedList<Player> bestPlayers;
+	
+	//result vars
+	private static Collection<Player> bestPlayers;
 	private static double bestWar = 0;
-	private static double currMax = 0;
+	
+	//status vars
 	private static Roster currentRoster = new Roster();
-	private static HashMap<Set<Position>, Double> bestYearPosWAR[];
-
-	@SuppressWarnings("unchecked")
-	public static void initBestYearPosWAR() {
-		bestYearPosWAR = (HashMap<Set<Position>, Double>[]) new HashMap[25];
-		for (int i = 0; i < bestYearPosWAR.length; i++) {
-			bestYearPosWAR[i] = new HashMap<>();
-		}
-	}
+	private static boolean[] taken = new boolean[25];
+	
+	private static final double allowThreshold = 2.5; //take players with war greater than this
+	private static final int printThreshold = 21; //print if in a loop greater than this number
+	private static final int timing  = 22; //iteration we are trying to time, must be greater than printThreshold
+	private static long mili;
+	
 	public static void main(String[] args) throws IOException {
-		initBestYearPosWAR();
 		ArrayList<Player> players = getPlayersFromFile();
 		players.sort(new Comparator<Player>() {
 			@Override
@@ -37,52 +39,104 @@ public class Calculator {
 				return 0;
 			}
 		});
-		System.out.println(players.size());	
+System.out.println(players.size());	
 		
-		years = new ArrayList<ArrayList<Player>>(25);
+		//split it by year
+		ArrayList<ArrayList<Player>> years = new ArrayList<ArrayList<Player>>(25);
 		for(int i = 0; i < 25; i++) {
 			years.add(new ArrayList<Player>());
 		}
-		int count = 0;
 		for(Player p: players) {
-			if(p.getWAR() > 1.1) {
+			if(p.getWAR() > allowThreshold) {
 				years.get(p.getSeason() - 1992).add(p);
-				count++;
 			}
 		}
-		System.out.println(count);
-//		if (count > 0) return;
+		
+		//set up array to know when to call it quits
 		bestPerYear = new double[25];
-		for(int i = 0; i < 25; i++) {
-			bestPerYear[i] = years.get(i).get(0).getWAR();
-		}
+		bestPerYear[0] = years.get(0).get(0).getWAR();
 		for(int i = 1; i < 25; i++) {
-			bestPerYear[i] += bestPerYear[i - 1]; 
+			bestPerYear[i] = years.get(i).get(0).getWAR() + bestPerYear[i - 1]; 
 		}
 		
-		System.out.println(Arrays.toString(bestPerYear));
-		findBest(24);
+		//set up 2-D map of year - position
+		array = new ArrayList<ArrayList<ArrayList<Player>>>(25);
+		for(int i = 0; i < 25; i++) {
+			array.add( new ArrayList<ArrayList<Player>>(25) );
+			for(int j = 0; j < 25; j++) {
+				array.get(i).add( new ArrayList<Player>() );
+			}
+		}
 		
-		System.out.println("best WAR: " + bestWar);
+		Position[] positions = {Position.SP, Position.SP, Position.SP, Position.SP, Position.SP, 
+								Position.RP, Position.RP, Position.RP, Position.RP, Position.RP, Position.RP, Position.RP,
+								Position.C, Position.SS, Position.OF, Position.OF,
+								Position.B1, Position.B2, Position.B3, Position.CF, Position.LF, Position.RF, Position.C, Position.SS, 
+								Position.DH};
+		//populate 2-D array of year - position
+		for(int i = 0; i < 25; i++) {
+			ArrayList<Player> year = years.get(i);
+			for(Player p: year) {
+				for(int j = 0; j < 25; j++) {
+					if(positions[j] == p.getPosition())
+						array.get(i).get(j).add(p);
+				}
+			}
+		}
+		
+		years = null; //lets the run time enviorment clean up that data structure
+		
+		for(int i = 0; i < 25; i++) {
+			taken[i] = false;
+		}
+		
+		mili = System.currentTimeMillis();
+		compute(24);
 		System.out.println(bestPlayers.toString());
 	}
-
-	private static double maxRemainingWAR(int year, Set<Position> availablePositions) {
-		double remaining = 0;
-		for (;year >= 0; year--) {
-			if (!bestYearPosWAR[year].containsKey(availablePositions)){
-				double yearMax = 0;
-				for (Player player: years.get(year)) {
-					double war = player.getWAR();
-					if (war > yearMax && availablePositions.contains(player.getPosition())) yearMax = war;
-				}
-				bestYearPosWAR[year].put(availablePositions, yearMax);
-			}
-			remaining += bestYearPosWAR[year].get(availablePositions);
-		}
-		return remaining;
-	}
 	
+	private static void compute(int year) {
+		if(year < 0)
+			return;
+		else if(currentRoster.getWar() + bestPerYear[year] <= bestWar) { //check if solution is feasible
+			return;
+		}
+		
+		// temporary status printing, so we know what's going on, allows ofr timing of a certian loop
+		// update timing var to control this 
+		if(year >= printThreshold) {
+			System.out.print(year);
+			if(year == timing) {
+				System.out.println(": " + (System.currentTimeMillis() - mili));
+				mili = System.currentTimeMillis();
+			} else{
+				System.out.println();
+			}
+		}
+		
+		for(int i = 0; i < 25; i++) {
+			if(taken[i])
+				continue;
+			ArrayList<Player> position = array.get(year).get(i);
+			for(Player p : position) {
+				if((positionsMappings[i] == -1)? currentRoster.add(p): currentRoster.add(p, positionsMappings[i])) {
+					taken[i] = true;
+					if(year == 0) {
+						if(currentRoster.getWar() > bestWar) {
+							bestWar = currentRoster.getWar();
+							bestPlayers = currentRoster.getPlayers();
+System.out.println("year: " + year + " updated best team to have War: " + bestWar); //this isn't printing but that might be ok
+						}
+					} else {
+						compute(year - 1);
+					}
+					taken[i] = false;
+					if(!((positionsMappings[i] == -1)? currentRoster.removePlayer(p): currentRoster.removePlayer(p, positionsMappings[i]))) {System.err.println("Failed to remove Player"); System.exit(-1);}
+				}
+			}
+		}
+	}
+
 	private static ArrayList<Player> getPlayersFromFile() throws IOException {
 		File f = new File(dataPath);
 		BufferedReader scanner = new BufferedReader(new FileReader(f));
@@ -95,7 +149,7 @@ public class Calculator {
 		while((data = scanner.readLine()) != null) {
 			 info = data.split(",");
 			 if(info.length != 5) {
-				 System.err.println("info was of lenth " + info.length + "at player " + players.size());
+				 System.err.println("info was of length" + info.length + "at player " + players.size());
 				 System.exit(-1);
 			 }
 			 p = new Player(info[0], Integer.parseInt(info[1]), info[2], Double.parseDouble(info[3]), Integer.parseInt(info[4]));
@@ -104,46 +158,5 @@ public class Calculator {
 		scanner.close();
 		
 		return players;
-	}
-
-	@SuppressWarnings("unchecked")
-	private static void findBest(int year) {
-		if(year < 0) {
-			return;
-		}
-		
-		int i = 0;
-		double currWar = currentRoster.getWar();
-
-		for(Player p: years.get(year)) {
-			if(year > 16) {
-				System.out.println(year + ": " + (++i) + ", currWar: " + currWar + ", currMax: " + currMax +
-						", bestWar: " + bestWar);
-			}
-
-			Set<Position> remainingPositions = currentRoster.availablePositions();
-			if (currentRoster.remainingSpots(p.getPosition()) <= 1) {
-				remainingPositions.remove(p.getPosition());
-			}
-			if(year > 0 && currWar + maxRemainingWAR(year - 1,remainingPositions) + p.getWAR() < bestWar) {
-				if (year > 15) System.out.println("Sorry Babe... " + year);
-				return;
-			}
-			
-			if(currentRoster.add(p)) { //adding player is valid
-				double nextWar = currentRoster.getWar();
-				if(year == 0) {
-					if(nextWar > bestWar) {
-						bestWar = nextWar;
-						bestPlayers = currentRoster.getPlayers();
-						System.out.println("New Best: " + bestWar);
-						System.out.println(bestPlayers);
-					}
-				} else {
-					findBest(year - 1);
-				}
-				currentRoster.removePlayer(p);
-			}
-		}
 	}
 }
