@@ -21,6 +21,7 @@ public class Roster {
 	}
 
 	public Collection<Player> getPlayers() {
+
 		Collection<Player> players = new TreeSet<Player>(Comparator.comparing(Player::getSeason)) {
 			@Override
 			public String toString() {
@@ -39,6 +40,7 @@ public class Roster {
 			}
 
 		};
+
 		players.addAll(this.players.values());
 		return players;
 	}
