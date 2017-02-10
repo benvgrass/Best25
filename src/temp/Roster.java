@@ -23,7 +23,7 @@ public class Roster {
 		available.put(Position.DH, new RosterPosition(1));
 		playerIDs = new HashMap<>();
 	}
-	
+
 	public double getWar() {
 		int sum = 0;
 		for (RosterPosition r: available.values()) sum += r.getWAR();
@@ -42,7 +42,25 @@ public class Roster {
 	}
 
 	public LinkedList<Player> getPlayers() {
-		LinkedList<Player> players = new LinkedList<>();
+		LinkedList<Player> players = new LinkedList<Player>() {
+			@Override
+			public String toString() {
+				Iterator<Player> it = iterator();
+				if (! it.hasNext())
+					return "";
+
+				StringBuilder sb = new StringBuilder();
+				for (;;) {
+					Player e = it.next();
+					sb.append(e);
+					if (! it.hasNext())
+						return sb.toString();
+					sb.append('\n');
+				}
+			}
+
+		};
+
 		for (RosterPosition r: available.values()) players.addAll(r.getPlayers());
 		return players;
 	}
@@ -55,11 +73,33 @@ public class Roster {
 		return true;
 	}
 
+	public Set<Position> availablePositions() {
+		Set<Position> positions = new HashSet<>();
+		for (Position p: Position.values()) {
+			if (available.get(p).open()) {
+				positions.add(p);
+			}
+		}
+		return positions;
+	}
+
 	@Override
 	public String toString() {
 		return "Roster{" +
 				"available=" + available +
 				'}';
+	}
+
+	public HashMap<Position, RosterPosition> getAvailable() {
+		return available;
+	}
+
+	public HashMap<Integer, Integer> getPlayerIDs() {
+		return playerIDs;
+	}
+
+	public int remainingSpots(Position p) {
+		return available.get(p).remainingSpots();
 	}
 
 	public static void main(String[] args) {

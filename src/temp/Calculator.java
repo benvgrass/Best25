@@ -1,10 +1,10 @@
 package temp;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.*;
+import java.awt.datatransfer.*;
+import java.awt.Toolkit;
+
 
 public class Calculator {	
 	private static final String dataPath = "data" + File.separator + "jays.csv";
@@ -13,10 +13,19 @@ public class Calculator {
 	private static double[] bestPerYear;
 	private static LinkedList<Player> bestPlayers;
 	private static double bestWar = 0;
-	
+	private static double currMax = 0;
 	private static Roster currentRoster = new Roster();
-	
+	private static HashMap<Set<Position>, Double> bestYearPosWAR[];
+
+	@SuppressWarnings("unchecked")
+	public static void initBestYearPosWAR() {
+		bestYearPosWAR = (HashMap<Set<Position>, Double>[]) new HashMap[25];
+		for (int i = 0; i < bestYearPosWAR.length; i++) {
+			bestYearPosWAR[i] = new HashMap<>();
+		}
+	}
 	public static void main(String[] args) throws IOException {
+		initBestYearPosWAR();
 		ArrayList<Player> players = getPlayersFromFile();
 		players.sort(new Comparator<Player>() {
 			@Override
@@ -34,13 +43,15 @@ public class Calculator {
 		for(int i = 0; i < 25; i++) {
 			years.add(new ArrayList<Player>());
 		}
-		
+		int count = 0;
 		for(Player p: players) {
-			if(p.getWAR() > 0) {
+			if(p.getWAR() > 1.1) {
 				years.get(p.getSeason() - 1992).add(p);
+				count++;
 			}
 		}
-		
+		System.out.println(count);
+//		if (count > 0) return;
 		bestPerYear = new double[25];
 		for(int i = 0; i < 25; i++) {
 			bestPerYear[i] = years.get(i).get(0).getWAR();
@@ -54,6 +65,22 @@ public class Calculator {
 		
 		System.out.println("best WAR: " + bestWar);
 		System.out.println(bestPlayers.toString());
+	}
+
+	private static double maxRemainingWAR(int year, Set<Position> availablePositions) {
+		double remaining = 0;
+		for (;year >= 0; year--) {
+			if (!bestYearPosWAR[year].containsKey(availablePositions)){
+				double yearMax = 0;
+				for (Player player: years.get(year)) {
+					double war = player.getWAR();
+					if (war > yearMax && availablePositions.contains(player.getPosition())) yearMax = war;
+				}
+				bestYearPosWAR[year].put(availablePositions, yearMax);
+			}
+			remaining += bestYearPosWAR[year].get(availablePositions);
+		}
+		return remaining;
 	}
 	
 	private static ArrayList<Player> getPlayersFromFile() throws IOException {
@@ -79,26 +106,38 @@ public class Calculator {
 		return players;
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void findBest(int year) {
 		if(year < 0) {
 			return;
 		}
 		
 		int i = 0;
+		double currWar = currentRoster.getWar();
+
 		for(Player p: years.get(year)) {
-			if(year > 10) {
-				System.out.println(year + ": " + (++i));
+			if(year > 16) {
+				System.out.println(year + ": " + (++i) + ", currWar: " + currWar + ", currMax: " + currMax +
+						", bestWar: " + bestWar);
 			}
-			
-			if(year > 0 && currentRoster.getWar() + bestPerYear[year - 1] + p.getWAR() < bestWar) {
-				return ;
+
+			Set<Position> remainingPositions = currentRoster.availablePositions();
+			if (currentRoster.remainingSpots(p.getPosition()) <= 1) {
+				remainingPositions.remove(p.getPosition());
+			}
+			if(year > 0 && currWar + maxRemainingWAR(year - 1,remainingPositions) + p.getWAR() < bestWar) {
+				if (year > 15) System.out.println("Sorry Babe... " + year);
+				return;
 			}
 			
 			if(currentRoster.add(p)) { //adding player is valid
+				double nextWar = currentRoster.getWar();
 				if(year == 0) {
-					if(currentRoster.getWar() > bestWar) {
-						bestWar = currentRoster.getWar();
+					if(nextWar > bestWar) {
+						bestWar = nextWar;
 						bestPlayers = currentRoster.getPlayers();
+						System.out.println("New Best: " + bestWar);
+						System.out.println(bestPlayers);
 					}
 				} else {
 					findBest(year - 1);

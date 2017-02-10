@@ -53,4 +53,13 @@ public class RosterPosition {
                 ", war=" + getWAR() +
                 '}';
     }
+
+    public boolean open() {
+        return numPlayers < max;
+    }
+
+    public int remainingSpots() {
+        return max - numPlayers;
+    }
+
 }

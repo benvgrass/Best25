@@ -78,7 +78,6 @@ public class Player {
 
 	@Override
 	public String toString() {
-		return "Player [id=" + id + ", position=" + position + ", season=" + season + ", name=" + name + ", WAR=" + WAR
-				+ ", fID=" + fID + "]";
+		return season + "\t" + position + "\t" + name + "\tWAR: " + WAR;
 	}
 }
