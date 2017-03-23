@@ -22,23 +22,14 @@ public class Calculator {
 	private static Roster currentRoster = new Roster();
 	private static boolean[] taken = new boolean[25];
 	
-	private static final double allowThreshold = 2.5; //take players with war greater than this
-	private static final int printThreshold = 21; //print if in a loop greater than this number
+	private static final double allowThreshold = 1.1; //take players with war greater than this
+	private static final int printThreshold = 12; //print if in a loop greater than this number
 	private static final int timing  = 22; //iteration we are trying to time, must be greater than printThreshold
 	private static long mili;
 	
 	public static void main(String[] args) throws IOException {
 		ArrayList<Player> players = getPlayersFromFile();
-		players.sort(new Comparator<Player>() {
-			@Override
-			public int compare(Player o1, Player o2) {
-				if(o1.getWAR() < o2.getWAR())
-					return 1;
-				else if(o1.getWAR() > o2.getWAR())
-					return -1;
-				return 0;
-			}
-		});
+		players.sort(Comparator.comparing(Player::getWAR));
 System.out.println(players.size());	
 		
 		//split it by year
