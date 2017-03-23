@@ -2,109 +2,34 @@ package temp;
 
 import java.util.*;
 
+/**
+ * Our Roster will serve as our 'graph' of sorts.
+ * We Want our maximal spanning roster: a roster that fills all positions with maximal value.
+ * Our 'edges' will be the sum of the two players WARs.
+ * In reality, if a player is on the roster, the maximal edge that can be used and isn't connected,
+ * is a player that's position isn't yet filled.
+ */
 public class Roster {
 	
-	private HashMap<Integer, Player> players;
-	
-	private HashMap<Position, ArrayList<Player>> positions;
+	public List<Player> players;
 	
 	public Roster () {
-		this.players = new HashMap<>(50);
-		this.positions = new HashMap<>(10);
-		
-		ArrayList<Player> sp = new ArrayList<>(5);
-		ArrayList<Player> rp = new ArrayList<>(7);
-		ArrayList<Player> c = new ArrayList<>(2);
-		ArrayList<Player> ss = new ArrayList<>(2);
-		ArrayList<Player> of = new ArrayList<>(2);
-		
-		for(int i = 0; i < 5; i++) {
-			sp.add(Player.defaultPlayer);
-		}
-		positions.put(Position.SP, sp);
-		
-		for(int i = 0; i < 7; i++) {
-			rp.add(Player.defaultPlayer);
-		}
-		positions.put(Position.RP, rp);
-		
-		for(int i = 0; i < 2; i++) {
-			c.add(Player.defaultPlayer);
-		}
-		positions.put(Position.C, c);
-		
-		for(int i = 0; i < 2; i++) {
-			ss.add(Player.defaultPlayer);
-		}
-		positions.put(Position.SS, ss);
-		
-		for(int i = 0; i < 2; i++) {
-			of.add(Player.defaultPlayer);
-		}
-		positions.put(Position.OF, of);
+		players = new LinkedList<>();
 	}
 
 	public double getWar() {
 		double sum = 0;
-		for (Player p: players.values()) sum += p.getWAR();
+		for (Player p: players) sum += p.getWAR();
 		return sum;
 	}
 	
 	public boolean add(Player p) {
-		return players.putIfAbsent(p.getfID(), p) == null;
-	}
-	
-	public boolean add(Player p, int i) {
-		Position pos = p.getPosition();
-		Player temp = null;
-		ArrayList<Player> players = positions.get(pos);
-		if(i <= players.size() - 2 && players.get(i + 1).getWAR() <= p.getWAR()) { 
-			//player is valid to add
-			temp = players.set(i, p);
-			if(!add(p)) {
-				players.set(i, temp);
-				return false;
-			} return true;
-		} else if(i <= positions.get(pos).size() - 2) {
-			return false; //not valid to add
-		}
-		
-		return add(p);
-	}
-	
-	public boolean removePlayer(Player p) {
-		return players.remove(p.getfID(), p);
-	}
-	
-	public boolean removePlayer(Player p, int i) {
-		if(i <= players.size() - 2)
-			positions.get(p.getPosition()).set(i, Player.defaultPlayer);
-		return removePlayer(p);
+	    // TODO: implement
+	    return false;
 	}
 
-	public Collection<Player> getPlayers() {
-
-		Collection<Player> players = new TreeSet<Player>(Comparator.comparing(Player::getSeason)) {
-			@Override
-			public String toString() {
-				Iterator<Player> it = iterator();
-				if (! it.hasNext())
-					return "";
-
-				StringBuilder sb = new StringBuilder();
-				for (;;) {
-					Player e = it.next();
-					sb.append(e);
-					if (! it.hasNext())
-						return sb.toString();
-					sb.append('\n');
-				}
-			}
-
-		};
-
-		players.addAll(this.players.values());
-		return players;
+	public List<Player> getPlayers() {
+        return players;
 	}
 
 
