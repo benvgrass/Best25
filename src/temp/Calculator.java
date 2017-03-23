@@ -16,15 +16,16 @@ public class Calculator {
 	public static void main(String[] args) throws IOException {
 
 		ArrayList<Player> players = getPlayersFromFile();
-		players.sort(Comparator.comparing(Player::getWAR).reversed());
         System.out.println("Number of players: " + players.size());
 
         Roster result = compute(1992, players);
+        System.out.println(result);
 
 	}
 	
 	public static Roster compute(int startYear, ArrayList<Player> players) {
-	    Roster roster = new Roster(startYear);
+        players.sort(Comparator.comparing(Player::getWAR).reversed());
+        Roster roster = new Roster(startYear);
 	    Player[] initialPlayers = maxPair(players);
 	    System.out.println(initialPlayers[0].toString() + '\n' + initialPlayers[1].toString());
 
@@ -33,8 +34,13 @@ public class Calculator {
 	    boolean v1 = roster.add(initialPlayers[0]);
 	    boolean v2 = roster.add(initialPlayers[1]);
 	    assert v1 && v2;
-
-		// TODO: implement kruskals
+        players.remove(initialPlayers[0]);
+        players.remove(initialPlayers[1]);
+        int i;
+        for (i = 0; (i < players.size()) && !roster.isValidRoster(); i++) {
+            roster.add(players.get(i));
+        }
+        System.out.println(i);
 		return roster;
 	}
 

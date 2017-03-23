@@ -51,7 +51,7 @@ public class Roster {
 
 	private boolean isValidAddition(Player playerToAdd) {
 	    return (!usedPlayers.contains(playerToAdd.getfID()) && availablePositions[playerToAdd.posInt()] > 0 &&
-                availableYears[playerToAdd.getSeason()-START_YEAR]);
+                availableYears[playerToAdd.getSeason()-START_YEAR] && players.size() < 25);
     }
 
 
@@ -59,6 +59,28 @@ public class Roster {
 	    boolean validPositions = (p1.getPosition() != p2.getPosition()) ||
                 (Position.maxPlayersForPosition[p1.posInt()] >= 2);
 	    return (p1.getSeason() != p2.getSeason() && p1.getfID() != p2.getfID() && validPositions);
+    }
+
+    public boolean isValidRoster() {
+	    if (players.size() != 25) return false;
+
+	    for (int available : availablePositions) {
+	        if (available != 0) {
+	            System.err.println("Full Roster, positions are wrong?");
+	            System.err.print(this);
+                return false;
+            }
+        }
+
+	    for (boolean available : availableYears) {
+	        if (available) {
+                System.err.println("Full Roster, years available?");
+                System.err.print(this);
+                return false;
+            }
+        }
+
+        return true;
     }
 
 	@Override
