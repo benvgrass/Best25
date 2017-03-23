@@ -26,6 +26,10 @@ public class PlayerPair {
         return p2;
     }
 
+    public boolean hasSamePosition() {
+        return p1.getPosition() == p2.getPosition();
+    }
+
     public static Comparator<PlayerPair> comparator = Comparator.comparing(PlayerPair::getWAR).reversed();
 
 }

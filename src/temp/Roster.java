@@ -47,29 +47,50 @@ public class Roster {
 		for (Player p: players) sum += p.getWAR();
 		return sum;
 	}
-	
-	public boolean add(Player p) {
 
-	    if (isValidAddition(p)) {
-	        usedPlayers.add(p.getfID());
-	        availablePositions[p.posInt()] -= 1;
-	        availableYears[p.getSeason() - START_YEAR] = false;
-	        players.add(p);
-	        return true;
+	public void addPlayerPair(PlayerPair pair) {
+	    boolean p1Roster = onRoster(pair.getP1());
+	    boolean p2Roster = onRoster(pair.getP2());
+	    if ((!p1Roster && !p2Roster) && validAdditionTogether(pair)) {
+	        add(pair.getP1());
+	        add(pair.getP2());
+        } else if ((p1Roster && !p2Roster) && isValidAddition(pair.getP2())) {
+            add(pair.getP2());
+        } else if ((!p1Roster && p2Roster) && isValidAddition(pair.getP1())) {
+	        add(pair.getP1());
         }
+    }
 
-	    return false;
+	private void add(Player p) {
+        usedPlayers.add(p.getfID());
+        availablePositions[p.posInt()] -= 1;
+        availableYears[p.getSeason() - START_YEAR] = false;
+        players.add(p);
 	}
 
 	public List<Player> getPlayers() {
         return players;
 	}
 
+	private boolean onRoster(Player p) {
+	    return players.contains(p);
+    }
+
 	private boolean isValidAddition(Player playerToAdd) {
 	    return (!usedPlayers.contains(playerToAdd.getfID()) && availablePositions[playerToAdd.posInt()] > 0 &&
                 availableYears[playerToAdd.getSeason()-START_YEAR] && players.size() < 25);
     }
 
+    private boolean validAdditionTogether(PlayerPair pairToAdd) {
+	    if (!isValidAddition(pairToAdd.getP1()) || !isValidAddition(pairToAdd.getP2())) {
+            return false;
+        } else if (25 - players.size() < 2) {
+	        return false;
+        } else if (pairToAdd.hasSamePosition() && availablePositions[pairToAdd.getP1().posInt()] < 2) {
+	        return false;
+        }
+        return true;
+    }
 
     public static boolean isValidPair(Player p1, Player p2) {
 	    boolean validPositions = (p1.getPosition() != p2.getPosition()) ||

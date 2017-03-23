@@ -26,47 +26,39 @@ public class Calculator {
 	public static Roster compute(int startYear, ArrayList<Player> players) {
         players.sort(Comparator.comparing(Player::getWAR).reversed());
         Roster roster = new Roster(startYear);
-	    Player[] initialPlayers = maxPair(players);
-	    System.out.println(initialPlayers[0].toString() + '\n' + initialPlayers[1].toString());
+	    PriorityQueue<PlayerPair> playerPairs = getPlayerPairs(players);
 
-        assert initialPlayers.length == 2;
-
-	    boolean v1 = roster.add(initialPlayers[0]);
-	    boolean v2 = roster.add(initialPlayers[1]);
-	    assert v1 && v2;
-        players.remove(initialPlayers[0]);
-        players.remove(initialPlayers[1]);
-        int i;
-        for (i = 0; (i < players.size()) && !roster.isValidRoster(); i++) {
-            roster.add(players.get(i));
+        int c = 0;
+        while (!roster.isValidRoster() && !playerPairs.isEmpty()) {
+            c++;
+            roster.addPlayerPair(playerPairs.poll());
         }
-        System.out.println(i);
+
+        System.out.println(c);
+        assert roster.isValidRoster();
+
 		return roster;
 	}
 
     /**
-     * Get maximal player pair
+     * Returns Priority Queue of player pairs, priority is highest first
      * @param players list of players
-     * @return maximal war pair of two players who can be on roster together
+     * @return priority queue of player pairs
      */
-	private static Player[] maxPair(ArrayList<Player> players) {
+	private static PriorityQueue<PlayerPair> getPlayerPairs(ArrayList<Player> players) {
 	    int length = players.size();
-	    double max = 0;
-	    Player[] maxPlayerPair = new Player[2];
+	    int initialCapacity = (length*(length - 1))/2;
+	    PriorityQueue<PlayerPair> playerPairs = new PriorityQueue<>(initialCapacity, PlayerPair.comparator);
 
 	    for (int i = 0; i < length; i++) {
-	        if (players.get(i).getWAR() + players.get(0).getWAR() < max) break;
-	        for (int j = 0; j < length; j++) {
-	            if (players.get(i).getWAR() + players.get(j).getWAR() < max) break;
-	            if (Roster.isValidPair(players.get(i), players.get(j)) &&
-                        players.get(i).getWAR() + players.get(j).getWAR() > max) {
-	                maxPlayerPair[0] = players.get(i);
-	                maxPlayerPair[1] = players.get(j);
-	                max = players.get(i).getWAR() + players.get(j).getWAR();
+	        for (int j = i + 1; j < length; j++) {
+	            if (Roster.isValidPair(players.get(i), players.get(j))) {
+	                PlayerPair newPair = new PlayerPair(players.get(i), players.get(j));
+	                playerPairs.add(newPair);
                 }
             }
         }
-	    return maxPlayerPair;
+	    return playerPairs;
     }
 
 	private static ArrayList<Player> getPlayersFromFile() throws IOException {
