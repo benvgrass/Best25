@@ -26,7 +26,7 @@ public class Roster {
 		START_YEAR = startYear;
 	}
 
-	public double getWar() {
+	public double getWAR() {
 		double sum = 0;
 		for (Player p: players) sum += p.getWAR();
 		return sum;
@@ -56,12 +56,14 @@ public class Roster {
 
 
     public static boolean isValidPair(Player p1, Player p2) {
-	    return (p1.getSeason() != p2.getSeason() && p1.getfID() != p2.getfID() && p2.getPosition() != p2.getPosition());
+	    boolean validPositions = (p1.getPosition() != p2.getPosition()) ||
+                (Position.maxPlayersForPosition[p1.posInt()] >= 2);
+	    return (p1.getSeason() != p2.getSeason() && p1.getfID() != p2.getfID() && validPositions);
     }
 
 	@Override
 	public String toString() {
-		return getPlayers().toString();
+		return "Total WAR: " + this.getWAR() + '\n' + getPlayers().toString();
 	}
 
 }
