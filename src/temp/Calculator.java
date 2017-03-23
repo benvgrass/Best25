@@ -29,7 +29,7 @@ public class Calculator {
 	
 	public static void main(String[] args) throws IOException {
 		ArrayList<Player> players = getPlayersFromFile();
-		players.sort(Comparator.comparing(Player::getWAR));
+		players.sort(Comparator.comparing(Player::getWAR).reversed());
 System.out.println(players.size());	
 		
 		//split it by year
