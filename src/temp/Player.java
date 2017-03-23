@@ -39,6 +39,10 @@ public class Player {
 		return position;
 	}
 
+	public int posInt() {
+	    return position.ordinal();
+    }
+
 	public int getSeason() {
 		return season;
 	}

@@ -11,10 +11,19 @@ import java.util.*;
  */
 public class Roster {
 	
-	public List<Player> players;
-	
-	public Roster () {
+	private List<Player> players;
+	private int[] availablePositions;
+	private boolean[] availableYears;
+	private Set<Integer> usedPlayers;
+	private final int START_YEAR;
+
+	public Roster (int startYear) {
 		players = new LinkedList<>();
+		availablePositions = Arrays.copyOf(Position.maxPlayersForPosition, Position.maxPlayersForPosition.length);
+		availableYears =  new boolean[25];
+		Arrays.fill(availableYears, true);
+		usedPlayers = new HashSet<>();
+		START_YEAR = startYear;
 	}
 
 	public double getWar() {
@@ -24,7 +33,15 @@ public class Roster {
 	}
 	
 	public boolean add(Player p) {
-	    // TODO: implement
+
+	    if (isValidAddition(p)) {
+	        usedPlayers.add(p.getfID());
+	        availablePositions[p.posInt()] -= 1;
+	        availableYears[p.getSeason() - START_YEAR] = false;
+	        players.add(p);
+	        return true;
+        }
+
 	    return false;
 	}
 
@@ -32,6 +49,15 @@ public class Roster {
         return players;
 	}
 
+	private boolean isValidAddition(Player playerToAdd) {
+	    return (!usedPlayers.contains(playerToAdd.getfID()) && availablePositions[playerToAdd.posInt()] > 0 &&
+                availableYears[playerToAdd.getSeason()-START_YEAR]);
+    }
+
+
+    public static boolean isValidPair(Player p1, Player p2) {
+	    return (p1.getSeason() != p2.getSeason() && p1.getfID() != p2.getfID() && p2.getPosition() != p2.getPosition());
+    }
 
 	@Override
 	public String toString() {
