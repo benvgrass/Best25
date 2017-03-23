@@ -18,7 +18,23 @@ public class Roster {
 	private final int START_YEAR;
 
 	public Roster (int startYear) {
-		players = new LinkedList<>();
+		players = new LinkedList<Player>() {
+            @Override
+            public String toString() {
+                Iterator<Player> it = iterator();
+                if (! it.hasNext())
+                    return "";
+                StringBuilder sb = new StringBuilder();
+                for (;;) {
+                    Player e = it.next();
+                    sb.append(e);
+                    if (! it.hasNext())
+                        return sb.toString();
+                    sb.append('\n');
+                }
+            }
+
+        };
 		availablePositions = Arrays.copyOf(Position.maxPlayersForPosition, Position.maxPlayersForPosition.length);
 		availableYears =  new boolean[25];
 		Arrays.fill(availableYears, true);

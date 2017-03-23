@@ -93,6 +93,6 @@ public class Player {
 
 	@Override
 	public String toString() {
-		return season + "\t" + position + "\t" + name + "\tWAR: " + WAR;
+		return season + "\t" + position + "\t" + name + "\t\tWAR: " + WAR;
 	}
 }
